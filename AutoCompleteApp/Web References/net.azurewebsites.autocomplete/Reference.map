@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<DiscoveryClientResultsFile xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Results>
+    <DiscoveryClientResult referenceType="System.Web.Services.Discovery.DiscoveryDocumentReference" url="http://autocomplete.azurewebsites.net/WebService/AutoCompleteOMST.asmx?disco" filename="AutoCompleteOMST.disco" />
+    <DiscoveryClientResult referenceType="System.Web.Services.Discovery.ContractReference" url="http://autocomplete.azurewebsites.net/WebService/AutoCompleteOMST.asmx?wsdl" filename="AutoCompleteOMST.wsdl" />
+  </Results>
+</DiscoveryClientResultsFile>

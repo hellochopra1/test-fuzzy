@@ -1,0 +1,27 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="AutoCompleteApp.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="AutoCompleteApp_AutoService_AutoGetTime" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">http://localhost:50358/AutoGetTime.asmx</Value>
+    </Setting>
+    <Setting Name="AutoCompleteApp_AutoServiceLive_AutoGetTime" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">http://autocomplete.omsttech.com/AutoGetTime.asmx</Value>
+    </Setting>
+    <Setting Name="AutoCompleteApp_LiveWebLocalHost_AutoCompleteOMST" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">http://localhost:51416/WebService/AutoCompleteOMST.asmx</Value>
+    </Setting>
+    <Setting Name="AutoCompleteApp_autocompleteadminLive_AutoCompleteOMST" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">http://autocompleteadmin.omsttech.com/WebService/AutoCompleteOMST.asmx</Value>
+    </Setting>
+    <Setting Name="AutoCompleteApp_net_azurewebsites_autocomplete_AutoCompleteOMST" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">http://autocomplete.azurewebsites.net/WebService/AutoCompleteOMST.asmx</Value>
+    </Setting>
+    <Setting Name="AutoCompleteApp_totalautocompleteLive_AutoCompleteOMST" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">http://www.totalautocomplete.com/WebService/AutoCompleteOMST.asmx</Value>
+    </Setting>
+    <Setting Name="AutoCompleteApp_YoutubeService_YoutubeService" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">http://autocompleteadmin.omsttech.com/WebService/YoutubeService.asmx</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>

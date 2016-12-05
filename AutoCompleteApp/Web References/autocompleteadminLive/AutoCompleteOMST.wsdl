@@ -1,0 +1,463 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:tns="http://tempuri.org/" xmlns:s="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tm="http://microsoft.com/wsdl/mime/textMatching/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" targetNamespace="http://tempuri.org/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <s:schema elementFormDefault="qualified" targetNamespace="http://tempuri.org/">
+      <s:element name="SelectTopKeyword">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="Id" type="s:int" />
+            <s:element minOccurs="1" maxOccurs="1" name="IsTesting" type="s:boolean" />
+            <s:element minOccurs="1" maxOccurs="1" name="IsBing" type="s:boolean" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="SelectTopKeywordResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="SelectTopKeywordResult">
+              <s:complexType>
+                <s:sequence>
+                  <s:element ref="s:schema" />
+                  <s:any />
+                </s:sequence>
+              </s:complexType>
+            </s:element>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ResetSearchCounter">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="IsTesting" type="s:boolean" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ResetSearchCounterResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="ResetSearchCounterResult">
+              <s:complexType>
+                <s:sequence>
+                  <s:element ref="s:schema" />
+                  <s:any />
+                </s:sequence>
+              </s:complexType>
+            </s:element>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ResetSearchCounterForHoldKeywords">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="IsTesting" type="s:boolean" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ResetSearchCounterForHoldKeywordsResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="ResetSearchCounterForHoldKeywordsResult">
+              <s:complexType>
+                <s:sequence>
+                  <s:element ref="s:schema" />
+                  <s:any />
+                </s:sequence>
+              </s:complexType>
+            </s:element>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetTotalCountForKeywords">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="IsTesting" type="s:boolean" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetTotalCountForKeywordsResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetTotalCountForKeywordsResult" type="tns:ArrayOfGetCountClass" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="ArrayOfGetCountClass">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="GetCountClass" nillable="true" type="tns:GetCountClass" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="GetCountClass">
+        <s:sequence>
+          <s:element minOccurs="1" maxOccurs="1" name="Count" type="s:int" />
+        </s:sequence>
+      </s:complexType>
+      <s:element name="SelectTopProxy">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="Id" type="s:int" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="SelectTopProxyResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="SelectTopProxyResult">
+              <s:complexType>
+                <s:sequence>
+                  <s:element ref="s:schema" />
+                  <s:any />
+                </s:sequence>
+              </s:complexType>
+            </s:element>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="LockDownKeyword">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="Id" type="s:int" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="LockDownKeywordResponse">
+        <s:complexType />
+      </s:element>
+      <s:element name="LockDownProxy">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="Id" type="s:int" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="LockDownProxyResponse">
+        <s:complexType />
+      </s:element>
+      <s:element name="ReleaseKeyword">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="Id" type="s:int" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ReleaseKeywordResponse">
+        <s:complexType />
+      </s:element>
+      <s:element name="ReleaseProxy">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="Id" type="s:int" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ReleaseProxyResponse">
+        <s:complexType />
+      </s:element>
+      <s:element name="IncreaseSearchCounter">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="Id" type="s:int" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="IncreaseSearchCounterResponse">
+        <s:complexType />
+      </s:element>
+    </s:schema>
+  </wsdl:types>
+  <wsdl:message name="SelectTopKeywordSoapIn">
+    <wsdl:part name="parameters" element="tns:SelectTopKeyword" />
+  </wsdl:message>
+  <wsdl:message name="SelectTopKeywordSoapOut">
+    <wsdl:part name="parameters" element="tns:SelectTopKeywordResponse" />
+  </wsdl:message>
+  <wsdl:message name="ResetSearchCounterSoapIn">
+    <wsdl:part name="parameters" element="tns:ResetSearchCounter" />
+  </wsdl:message>
+  <wsdl:message name="ResetSearchCounterSoapOut">
+    <wsdl:part name="parameters" element="tns:ResetSearchCounterResponse" />
+  </wsdl:message>
+  <wsdl:message name="ResetSearchCounterForHoldKeywordsSoapIn">
+    <wsdl:part name="parameters" element="tns:ResetSearchCounterForHoldKeywords" />
+  </wsdl:message>
+  <wsdl:message name="ResetSearchCounterForHoldKeywordsSoapOut">
+    <wsdl:part name="parameters" element="tns:ResetSearchCounterForHoldKeywordsResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetTotalCountForKeywordsSoapIn">
+    <wsdl:part name="parameters" element="tns:GetTotalCountForKeywords" />
+  </wsdl:message>
+  <wsdl:message name="GetTotalCountForKeywordsSoapOut">
+    <wsdl:part name="parameters" element="tns:GetTotalCountForKeywordsResponse" />
+  </wsdl:message>
+  <wsdl:message name="SelectTopProxySoapIn">
+    <wsdl:part name="parameters" element="tns:SelectTopProxy" />
+  </wsdl:message>
+  <wsdl:message name="SelectTopProxySoapOut">
+    <wsdl:part name="parameters" element="tns:SelectTopProxyResponse" />
+  </wsdl:message>
+  <wsdl:message name="LockDownKeywordSoapIn">
+    <wsdl:part name="parameters" element="tns:LockDownKeyword" />
+  </wsdl:message>
+  <wsdl:message name="LockDownKeywordSoapOut">
+    <wsdl:part name="parameters" element="tns:LockDownKeywordResponse" />
+  </wsdl:message>
+  <wsdl:message name="LockDownProxySoapIn">
+    <wsdl:part name="parameters" element="tns:LockDownProxy" />
+  </wsdl:message>
+  <wsdl:message name="LockDownProxySoapOut">
+    <wsdl:part name="parameters" element="tns:LockDownProxyResponse" />
+  </wsdl:message>
+  <wsdl:message name="ReleaseKeywordSoapIn">
+    <wsdl:part name="parameters" element="tns:ReleaseKeyword" />
+  </wsdl:message>
+  <wsdl:message name="ReleaseKeywordSoapOut">
+    <wsdl:part name="parameters" element="tns:ReleaseKeywordResponse" />
+  </wsdl:message>
+  <wsdl:message name="ReleaseProxySoapIn">
+    <wsdl:part name="parameters" element="tns:ReleaseProxy" />
+  </wsdl:message>
+  <wsdl:message name="ReleaseProxySoapOut">
+    <wsdl:part name="parameters" element="tns:ReleaseProxyResponse" />
+  </wsdl:message>
+  <wsdl:message name="IncreaseSearchCounterSoapIn">
+    <wsdl:part name="parameters" element="tns:IncreaseSearchCounter" />
+  </wsdl:message>
+  <wsdl:message name="IncreaseSearchCounterSoapOut">
+    <wsdl:part name="parameters" element="tns:IncreaseSearchCounterResponse" />
+  </wsdl:message>
+  <wsdl:portType name="AutoCompleteOMSTSoap">
+    <wsdl:operation name="SelectTopKeyword">
+      <wsdl:input message="tns:SelectTopKeywordSoapIn" />
+      <wsdl:output message="tns:SelectTopKeywordSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ResetSearchCounter">
+      <wsdl:input message="tns:ResetSearchCounterSoapIn" />
+      <wsdl:output message="tns:ResetSearchCounterSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ResetSearchCounterForHoldKeywords">
+      <wsdl:input message="tns:ResetSearchCounterForHoldKeywordsSoapIn" />
+      <wsdl:output message="tns:ResetSearchCounterForHoldKeywordsSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetTotalCountForKeywords">
+      <wsdl:input message="tns:GetTotalCountForKeywordsSoapIn" />
+      <wsdl:output message="tns:GetTotalCountForKeywordsSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="SelectTopProxy">
+      <wsdl:input message="tns:SelectTopProxySoapIn" />
+      <wsdl:output message="tns:SelectTopProxySoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="LockDownKeyword">
+      <wsdl:input message="tns:LockDownKeywordSoapIn" />
+      <wsdl:output message="tns:LockDownKeywordSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="LockDownProxy">
+      <wsdl:input message="tns:LockDownProxySoapIn" />
+      <wsdl:output message="tns:LockDownProxySoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ReleaseKeyword">
+      <wsdl:input message="tns:ReleaseKeywordSoapIn" />
+      <wsdl:output message="tns:ReleaseKeywordSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ReleaseProxy">
+      <wsdl:input message="tns:ReleaseProxySoapIn" />
+      <wsdl:output message="tns:ReleaseProxySoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="IncreaseSearchCounter">
+      <wsdl:input message="tns:IncreaseSearchCounterSoapIn" />
+      <wsdl:output message="tns:IncreaseSearchCounterSoapOut" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="AutoCompleteOMSTSoap" type="tns:AutoCompleteOMSTSoap">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="SelectTopKeyword">
+      <soap:operation soapAction="http://tempuri.org/SelectTopKeyword" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ResetSearchCounter">
+      <soap:operation soapAction="http://tempuri.org/ResetSearchCounter" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ResetSearchCounterForHoldKeywords">
+      <soap:operation soapAction="http://tempuri.org/ResetSearchCounterForHoldKeywords" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetTotalCountForKeywords">
+      <soap:operation soapAction="http://tempuri.org/GetTotalCountForKeywords" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SelectTopProxy">
+      <soap:operation soapAction="http://tempuri.org/SelectTopProxy" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="LockDownKeyword">
+      <soap:operation soapAction="http://tempuri.org/LockDownKeyword" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="LockDownProxy">
+      <soap:operation soapAction="http://tempuri.org/LockDownProxy" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReleaseKeyword">
+      <soap:operation soapAction="http://tempuri.org/ReleaseKeyword" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReleaseProxy">
+      <soap:operation soapAction="http://tempuri.org/ReleaseProxy" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="IncreaseSearchCounter">
+      <soap:operation soapAction="http://tempuri.org/IncreaseSearchCounter" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="AutoCompleteOMSTSoap12" type="tns:AutoCompleteOMSTSoap">
+    <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="SelectTopKeyword">
+      <soap12:operation soapAction="http://tempuri.org/SelectTopKeyword" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ResetSearchCounter">
+      <soap12:operation soapAction="http://tempuri.org/ResetSearchCounter" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ResetSearchCounterForHoldKeywords">
+      <soap12:operation soapAction="http://tempuri.org/ResetSearchCounterForHoldKeywords" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetTotalCountForKeywords">
+      <soap12:operation soapAction="http://tempuri.org/GetTotalCountForKeywords" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SelectTopProxy">
+      <soap12:operation soapAction="http://tempuri.org/SelectTopProxy" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="LockDownKeyword">
+      <soap12:operation soapAction="http://tempuri.org/LockDownKeyword" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="LockDownProxy">
+      <soap12:operation soapAction="http://tempuri.org/LockDownProxy" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReleaseKeyword">
+      <soap12:operation soapAction="http://tempuri.org/ReleaseKeyword" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReleaseProxy">
+      <soap12:operation soapAction="http://tempuri.org/ReleaseProxy" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="IncreaseSearchCounter">
+      <soap12:operation soapAction="http://tempuri.org/IncreaseSearchCounter" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="AutoCompleteOMST">
+    <wsdl:port name="AutoCompleteOMSTSoap" binding="tns:AutoCompleteOMSTSoap">
+      <soap:address location="http://autocompleteadmin.omsttech.com/WebService/AutoCompleteOMST.asmx" />
+    </wsdl:port>
+    <wsdl:port name="AutoCompleteOMSTSoap12" binding="tns:AutoCompleteOMSTSoap12">
+      <soap12:address location="http://autocompleteadmin.omsttech.com/WebService/AutoCompleteOMST.asmx" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

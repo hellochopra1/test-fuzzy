@@ -1,35 +1,21 @@
 ﻿#region Extensions
 
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 using System.Diagnostics;
-using OpenQA.Selenium.Chrome;
-using OpenQA.Selenium;
-using OpenQA.Selenium.Remote;
-using System.Collections.ObjectModel;
 using System.Net;
-using OpenQA.Selenium.Interactions;
 using System.Threading;
 using System.Runtime.InteropServices;
 using Microsoft.Win32;
 using System.Data.OleDb;
 using System.IO;
-using OpenQA.Selenium.Support.UI;
-using OpenQA.Selenium.Firefox;
-using OpenQA.Selenium.Safari;
-using OpenQA.Selenium.IE;
 using AutoCompleteApp.Classes;
-using System.Net.Sockets;
 using System.Text.RegularExpressions;
 using NDde.Client;
 using System.Windows.Automation;
-using WindowsInput;
 
 #endregion
 
@@ -2176,46 +2162,7 @@ namespace AutoCompleteApp
 
             }
         }
-
-        public void PagesForSafari(string form)
-        {
-            Random rnd1 = new Random();
-            int countRandom = 3 + rnd1.Next(1, 5);
-            IWebElement resultsPanelSub = StoredValues.DriverSafari.FindElement(By.LinkText(dsKeywords.Tables[0].Rows[0][form].ToString().Trim().TrimEnd().TrimStart()));
-            //((IJavaScriptExecutor)StoredValues.Driver).ExecuteScript("arguments[0].scrollIntoView(true);", resultsPanelSub);
-            countRandom = 3 + rnd1.Next(1, 5);
-            for (int second = 0; second < countRandom; second++)
-            {
-                ((IJavaScriptExecutor)StoredValues.DriverSafari).ExecuteScript("window.scrollBy(0," + (200 + rnd1.Next(10, 50)) + ")", "");
-                Thread.Sleep(200 + rnd1.Next(1, 5));
-            }
-            countRandom = 3 + rnd1.Next(1, 5);
-            for (int second1 = 0; second1 < countRandom; second1++)
-            {
-                ((IJavaScriptExecutor)StoredValues.DriverSafari).ExecuteScript("window.scrollBy(0," + (-200 + rnd1.Next(10, 50)) + ")", "");
-                Thread.Sleep(200 + rnd1.Next(1, 5));
-            }
-            countRandom = 3 + rnd1.Next(1, 5);
-            for (int second = 0; second < countRandom; second++)
-            {
-                ((IJavaScriptExecutor)StoredValues.DriverSafari).ExecuteScript("window.scrollBy(0," + (200 + rnd1.Next(10, 50)) + ")", "");
-                Thread.Sleep(200 + rnd1.Next(1, 5));
-            }
-            countRandom = 3 + rnd1.Next(1, 5);
-            for (int second1 = 0; second1 < countRandom; second1++)
-            {
-                ((IJavaScriptExecutor)StoredValues.DriverSafari).ExecuteScript("window.scrollBy(0," + (-200 + rnd1.Next(10, 50)) + ")", "");
-                Thread.Sleep(200 + rnd1.Next(1, 5));
-            }
-            //aa = resultsPanelSub.Location;
-            resultsPanelSub.Click();
-            //((IJavaScriptExecutor)StoredValues.DriverSafari).ExecuteScript("arguments[0].scrollIntoView(true);", resultsPanelSub);
-            //Actions actions = new Actions(StoredValues.DriverSafari);
-            //actions.MoveToElement(resultsPanelSub);
-            //actions.ClickAndHold();
-            //actions.Release();
-            //actions.Perform();
-        }
+        
 
         #endregion
 

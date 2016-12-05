@@ -1,35 +1,15 @@
 ﻿#region Extensions
 
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
-using System.Drawing;
 using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 using System.Diagnostics;
-using OpenQA.Selenium.Chrome;
-using OpenQA.Selenium;
-using OpenQA.Selenium.Remote;
-using System.Collections.ObjectModel;
 using System.Net;
-using OpenQA.Selenium.Interactions;
 using System.Threading;
 using System.Runtime.InteropServices;
-using Microsoft.Win32;
-using System.Data.OleDb;
-using System.IO;
-using OpenQA.Selenium.Support.UI;
-using OpenQA.Selenium.Firefox;
-using OpenQA.Selenium.Safari;
-using OpenQA.Selenium.IE;
 using AutoCompleteApp.Classes;
-using System.Net.Sockets;
 using System.Text.RegularExpressions;
-using NDde.Client;
-using System.Windows.Automation;
-using WindowsInput;
 
 #endregion
 

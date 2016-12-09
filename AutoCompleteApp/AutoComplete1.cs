@@ -2,33 +2,57 @@
 
 using System;
 using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Windows.Forms;
 using System.Diagnostics;
-using System.Net;
-using System.Threading;
-using System.Runtime.InteropServices;
+using System.Drawing;
 using System.IO;
-using AutoCompleteApp.Classes;
+using System.Linq;
+using System.Net;
+using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
+using System.Threading;
+using System.Windows.Forms;
+using AutoCompleteApp.autocompleteadminLive;
+using AutoCompleteApp.Classes;
+using AutoCompleteApp.Properties;
+using NLog;
 using static System.Convert;
 
 #endregion
 
 namespace AutoCompleteApp
 {
-
     public partial class AutoComplete1 : Form
     {
+        #region Start IPVanish
+
+        private static void StartIpVanish()
+        {
+            var process = new Process
+            {
+                StartInfo =
+                {
+                    FileName = Environment.Is64BitProcess
+                        ? @"C:\Program Files (x86)\IPVanish\VPNClient.exe"
+                        : @"C:\Program Files\IPVanish\VPNClient.exe",
+                    Verb = "runas",
+                    WindowStyle = ProcessWindowStyle.Hidden,
+                    UseShellExecute = false,
+                    RedirectStandardError = false
+                }
+            };
+
+            process.Start();
+        }
+
+        #endregion
 
         #region Home Settings
 
         [DllImport("user32.dll")]
         private static extern void mouse_event(int dwFlags, int dx, int dy, int dwData,
-          int dwExtraInfo);
+            int dwExtraInfo);
 
-        public enum MouseEventFlags
+        private enum MouseEventFlags
         {
             Leftdown = 0x00000002,
             Leftup = 0x00000004,
@@ -46,6 +70,7 @@ namespace AutoCompleteApp
 
         [DllImport("wininet.dll")]
         public static extern bool InternetSetOption(IntPtr hInternet, int dwOption, IntPtr lpBuffer, int dwBufferLength);
+
         public const int InternetOptionSettingsChanged = 39;
         public const int InternetOptionRefresh = 37;
         public const int InternetOptionProxySettingsChanged = 95;
@@ -53,58 +78,34 @@ namespace AutoCompleteApp
 
         //AutoService.AutoGetTime dd = new AutoService.AutoGetTime();
         //AutoServiceLive.AutoGetTime dd = new AutoServiceLive.AutoGetTime();
-        //LiveWebLocalHost.AutoCompleteOMST webService = new LiveWebLocalHost.AutoCompleteOMST();
-        //totalautocompleteLive.AutoCompleteOMST webService = new totalautocompleteLive.AutoCompleteOMST();
-        public readonly autocompleteadminLive.AutoCompleteOMST WebService = new autocompleteadminLive.AutoCompleteOMST();
+        //LiveWebLocalHost.AutoCompleteOMST _webService = new LiveWebLocalHost.AutoCompleteOMST();
+        private readonly totalautocompleteLive.AutoCompleteOMST _webService = new totalautocompleteLive.AutoCompleteOMST();
+        //private readonly AutoCompleteOMST _webService = new AutoCompleteOMST();
         //net.azurewebsites.autocomplete.AutoCompleteOMST webService = new net.azurewebsites.autocomplete.AutoCompleteOMST();
-        private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
 
-        DataSet _ds = new DataSet();
-        DataSet _dsKeywords = new DataSet();
+        private DataSet _ds = new DataSet();
+        private DataSet _dsKeywords = new DataSet();
 
         public AutoComplete1()
         {
             InitializeComponent();
 
             _isBingSearch = false;
-            ///Starting the application
+            //Starting the application
             timer5.Interval = 10000;
             timer5.Start();
-
-        }
-
-        #endregion
-
-        #region Start IPVanish
-
-        private static void StartIpVanish()
-        {
-            var process = new Process
-            {
-                StartInfo =
-                {
-                    FileName = System.Environment.Is64BitProcess
-                        ? @"C:\Program Files (x86)\IPVanish\VPNClient.exe"
-                        : @"C:\Program Files\IPVanish\VPNClient.exe",
-                    Verb = "runas",
-                    WindowStyle = ProcessWindowStyle.Hidden,
-                    UseShellExecute = false,
-                    RedirectStandardError = false
-                }
-            };
-
-            process.Start();
         }
 
         #endregion
 
         #region Setup and Configure new IP
 
-        int _initialCheckForBrowser = 0;
-        int _countryId = 0;
-        string _ipForVanish = string.Empty;
-        bool _check = false;
+        private int _initialCheckForBrowser;
+        private int _countryId;
+        private string _ipForVanish = string.Empty;
+        private bool _check;
 
         [DllImport("wininet.dll")]
         private static extern bool InternetGetConnectedState(out int description, int reservedValue);
@@ -113,19 +114,17 @@ namespace AutoCompleteApp
         {
             int desc;
             if (InternetGetConnectedState(out desc, 0))
-            {
                 try
                 {
-
-                    WebClient wc = new WebClient();
-                    string strIp = string.Empty;
-                    string strLocal = string.Empty;
+                    var wc = new WebClient();
+                    var strIp = string.Empty;
+                    var strLocal = string.Empty;
                     //string strIP = wc.DownloadString("http://checkip.dyndns.org");
-                    string ipAddress = new WebClient().DownloadString("http://icanhazip.com");
-                    strIp = (new Regex(@"\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b")).Match(ipAddress).Value;
+                    var ipAddress = new WebClient().DownloadString("http://icanhazip.com");
+                    strIp = new Regex(@"\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b").Match(ipAddress).Value;
                     wc.Dispose();
-                    strLocal = (new Regex(@"\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b")).Match(txtLocalIp.Text).Value;
-                    if (strIp != strLocal && strIp != _ipForVanish)
+                    strLocal = new Regex(@"\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b").Match(txtLocalIp.Text).Value;
+                    if ((strIp != strLocal) && (strIp != _ipForVanish))
                     {
                         _ipForVanish = strIp;
                         _check = true;
@@ -143,15 +142,11 @@ namespace AutoCompleteApp
                     CheckIpChange();
                     return false;
                 }
-            }
-            else
-            {
-                Logger.Debug("Internet not connected");
+            Logger.Debug("Internet not connected");
 
-                Thread.Sleep(10000);
-                CheckIpChange();
-                return false;
-            }
+            Thread.Sleep(10000);
+            CheckIpChange();
+            return false;
         }
 
         #endregion
@@ -161,159 +156,66 @@ namespace AutoCompleteApp
         private void timer1_Tick(object sender, EventArgs e)
         {
             timer1.Stop();
-            //CheckIpChange();
-            if (_initialCheckForBrowser < ToInt32(txtBrowser.Text) && chkChrome.Checked)
-            {
-                //ForGoogleSafari();
-                //ForFireFoxBrowser();
+            CheckIpChange();
+            if ((_initialCheckForBrowser < ToInt32(txtBrowser.Text)) && chkChrome.Checked)
                 ForGoogleChrome();
-                //ForGoogleIe();
-            }
-            else if (_initialCheckForBrowser < (ToInt32(txtBrowser.Text) * 2) && chkMozilla.Checked)
-            {
+            else if ((_initialCheckForBrowser < ToInt32(txtBrowser.Text) * 2) && chkMozilla.Checked)
                 ForFireFoxBrowser();
-            }
-            else if (_initialCheckForBrowser < (ToInt32(txtBrowser.Text) * 3) && chkSafari.Checked)
-            {
-                //ForGoogleIE();
-
+            else if ((_initialCheckForBrowser < ToInt32(txtBrowser.Text) * 3) && chkSafari.Checked)
                 ForGoogleSafari();
-            }
-            else if (_initialCheckForBrowser < (ToInt32(txtBrowser.Text) * 4) && chkIE.Checked)
-            {
+            else if ((_initialCheckForBrowser < ToInt32(txtBrowser.Text) * 4) && chkIE.Checked)
                 ForGoogleIe();
-            }
         }
 
         private void timer2_Tick(object sender, EventArgs e)
         {
-            if (_initialCheckForBrowser < ToInt32(txtBrowser.Text) && chkChrome.Checked)
+            if ((_initialCheckForBrowser < ToInt32(txtBrowser.Text)) && chkChrome.Checked)
             {
                 //ForIESecondStep();
                 //ForGoogleSafariSecond();
                 ForChromeSecondStep();
                 //ForFireFoxBrowserSecond();
                 if (!chkIE.Checked && !chkSafari.Checked && !chkMozilla.Checked)
-                { 
-                    if (_initialCheckForBrowser % (Convert.ToInt32(txtBrowser.Text) * 1) == 0)
-                    {
+                    if (_initialCheckForBrowser % (ToInt32(txtBrowser.Text) * 1) == 0)
                         _initialCheckForBrowser = 0;
-                    }
-                }
-
             }
-            else if ((_initialCheckForBrowser < (ToInt32(txtBrowser.Text) * 2) && chkMozilla.Checked) || (_initialCheckForBrowser < (ToInt32(txtBrowser.Text) * 1) && !chkChrome.Checked))
+            else if (((_initialCheckForBrowser < ToInt32(txtBrowser.Text) * 2) && chkMozilla.Checked) ||
+                     ((_initialCheckForBrowser < ToInt32(txtBrowser.Text) * 1) && !chkChrome.Checked))
             {
                 ForFireFoxBrowserSecond();
                 if (!chkIE.Checked && !chkSafari.Checked && !chkChrome.Checked)
-                {
-                    if (_initialCheckForBrowser % (Convert.ToInt32(txtBrowser.Text) * 1) == 0)
-                    {
+                    if (_initialCheckForBrowser % (ToInt32(txtBrowser.Text) * 1) == 0)
                         _initialCheckForBrowser = 0;
-                    }
-                }
                 if (!chkIE.Checked && !chkSafari.Checked)
-                {
-                    if (_initialCheckForBrowser % (Convert.ToInt32(txtBrowser.Text) * 2) == 0)
-                    {
+                    if (_initialCheckForBrowser % (ToInt32(txtBrowser.Text) * 2) == 0)
                         _initialCheckForBrowser = 0;
-                    }
-                }
             }
-            else if (_initialCheckForBrowser < (ToInt32(txtBrowser.Text) * 3) && chkSafari.Checked)
+            else if ((_initialCheckForBrowser < ToInt32(txtBrowser.Text) * 3) && chkSafari.Checked)
             {
                 ForGoogleSafariSecond();
                 //ForIESecondStep();
                 if (!chkIE.Checked)
-                {
-                    if (_initialCheckForBrowser % (Convert.ToInt32(txtBrowser.Text) * 3) == 0)
-                    {
+                    if (_initialCheckForBrowser % (ToInt32(txtBrowser.Text) * 3) == 0)
                         _initialCheckForBrowser = 0;
-                    }
-                }
             }
-            else if (_initialCheckForBrowser < (ToInt32(txtBrowser.Text) * 4) && chkIE.Checked)
+            else if ((_initialCheckForBrowser < ToInt32(txtBrowser.Text) * 4) && chkIE.Checked)
             {
                 ForIeSecondStep();
                 if (!chkSafari.Checked)
-                {
-                    if (_initialCheckForBrowser % (Convert.ToInt32(txtBrowser.Text) * 3) == 0)
+                    if (_initialCheckForBrowser % (ToInt32(txtBrowser.Text) * 3) == 0)
                     {
                         _initialCheckForBrowser = 0;
                         return;
                     }
-                }
 
                 if (_initialCheckForBrowser % (ToInt32(txtBrowser.Text) * 4) == 0)
-                {
                     _initialCheckForBrowser = 0;
-                }
             }
         }
 
         private void timer3_Tick(object sender, EventArgs e)
         {
             timer3.Stop();
-            //if (_initialCheckForBrowser < ToInt32(txtBrowser.Text))
-            //{
-            //    //checkChromeEnds:
-            //    //    SendKeys.Send("%{F4}");
-            //    //    Thread.Sleep(2000);
-
-            //    //    //MouseOperations.SetCursorPosition(1364, 2);
-            //    //    if (CheckEndChrome())
-            //    //        goto checkChromeEnds;
-            //    //clearchachelocalall();
-            //    _initialCheckForBrowser++;
-
-            //    timer1.Interval = 5000;
-            //    timer1.Start();
-            //}
-            //else if (_initialCheckForBrowser < (ToInt32(txtBrowser.Text) * 2))
-            //{
-            //    //checkFireFoxEnds:
-            //    //    SendKeys.Send("%{F4}");
-            //    //Thread.Sleep(2000);
-            //    //if (CheckEndFireFox())
-            //    //    goto checkFireFoxEnds;
-            //    //Endfirefox();
-            //    //clearchachelocalall();
-            //    _initialCheckForBrowser++;
-            //    //if (initialCheckForBrowser % (Convert.ToInt32(txtBrowser.Text) * 2) == 0)
-            //    //{
-            //    //    initialCheckForBrowser = 0;
-            //    //}
-
-            //    timer1.Interval = 5000;
-            //    timer1.Start();
-            //}
-            //else if (_initialCheckForBrowser < (ToInt32(txtBrowser.Text) * 3))
-            //{
-            //    ///For IE
-            //    // MouseOperations.SetCursorPosition(1364, 2);
-            //    _initialCheckForBrowser++;
-            //    if (_initialCheckForBrowser % (ToInt32(txtBrowser.Text) * 3) == 0)
-            //    {
-            //        _initialCheckForBrowser = 0;
-            //    }
-            //    timer1.Interval = 5000;
-            //    timer1.Start();
-
-            //    /////For Safari
-            //    //MouseOperations.SetCursorPosition(1364, 2);
-            //    //MouseClick();
-            //    //clearchachelocalall();
-            //    //timer1.Interval = 5000;
-            //    //timer1.Start();
-            //}
-            //else if (_initialCheckForBrowser < (ToInt32(txtBrowser.Text) * 4))
-            //{
-            //    ///For IE
-            //    MouseOperations.SetCursorPosition(1364, 2);
-            //    MouseClick();
-            //    timer1.Interval = 5000;
-            //    timer1.Start();
-            //}
             timer1.Interval = 5000;
             timer1.Start();
         }
@@ -336,38 +238,52 @@ namespace AutoCompleteApp
         private void timer5_Tick(object sender, EventArgs e)
         {
             timer5.Stop();
-            //CheckIpChange();  
-            txtBrowser.Text = @"1";
-            txtHomeWait.Text = @"20";
-            var strIp = string.Empty;
-            //string strIP = wc.DownloadString("http://checkip.dyndns.org");
-            string ipAddress = new WebClient().DownloadString("http://icanhazip.com");
-            strIp = (new Regex(@"\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b")).Match(ipAddress).Value;
-            txtLocalIp.Text = strIp;
-            chkIsTesting.Checked = true;
 
+            #region Tool Settings
+
+            var data = _webService.GetSettingsForGoogleAndBing(1);
+            //CheckIpChange();  
+            txtBrowser.Text = data.Tables[0].Rows[0]["NumberOfBrowserChange"].ToString();
+            txtHomeWait.Text = data.Tables[0].Rows[0]["HomeWait"].ToString();
+            chkChrome.Checked = true;
+            chkIE.Checked = true;
+            chkMozilla.Checked = true;
+            chkSafari.Checked = true;
             ddlCountry.Items.Insert(0, "US");
             ddlCountry.Items.Insert(1, "Canada");
             ddlCountry.SelectedIndex = 0;
+            var strIp = string.Empty;
+            //string strIP = wc.DownloadString("http://checkip.dyndns.org");
+            var ipAddress = new WebClient().DownloadString("http://icanhazip.com");
+            strIp = new Regex(@"\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b").Match(ipAddress).Value;
+            txtLocalIp.Text = strIp;
+            chkIsTesting.Checked = true;
+            
+            _searchType = 1;
+            _countryId = ddlCountry.SelectedIndex == 0 ? 1 : 2;
+            _isTesting = true;
+            WindowState = FormWindowState.Minimized;
+            notifyIcon2.BalloonTipTitle = @"Minimize to Tray";
+            notifyIcon2.BalloonTipText = @"App still running";
+            switch (WindowState)
+            {
+                case FormWindowState.Minimized:
+                    notifyIcon2.Visible = true;
+                    notifyIcon2.ShowBalloonTip(500);
+                    Hide();
+                    break;
+                case FormWindowState.Normal:
+                    notifyIcon2.Visible = false;
+                    break;
+                case FormWindowState.Maximized:
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
 
-            chkBing.Checked = false;
+            #endregion 
 
-            //Thread.Sleep(10000);
-
-
-
-            //IsTesting = true;
-            //CountryId = 1;
-            //this.WindowState = FormWindowState.Minimized;
-            //clearchachelocalall();
-            //Thread.Sleep(5000);
-            //timer1.Interval = 10000;
-            //timer1.Start();
-            //button1_Click(null, null);
-
-            //StartIPVanish();
-            //timer4.Interval = 30000;
-            //timer4.Start();
+            button1_Click(null, null);
         }
 
         #endregion
@@ -399,7 +315,6 @@ namespace AutoCompleteApp
             }
             catch (Exception ex)
             {
-
             }
         }
 
@@ -432,7 +347,6 @@ namespace AutoCompleteApp
             }
             catch (Exception ex)
             {
-
             }
         }
 
@@ -460,8 +374,6 @@ namespace AutoCompleteApp
             }
             catch (Exception ex)
             {
-
-
             }
         }
 
@@ -477,7 +389,6 @@ namespace AutoCompleteApp
             }
             catch (Exception ex)
             {
-
             }
         }
 
@@ -489,7 +400,6 @@ namespace AutoCompleteApp
             }
             catch (Exception ex)
             {
-
             }
         }
 
@@ -505,7 +415,7 @@ namespace AutoCompleteApp
             _timerAll = DateTime.Now;
             ServicePointManager.Expect100Continue = false;
             _dsKeywords = new DataSet();
-            _dsKeywords = WebService.SelectTopKeyword(_countryId, _isTesting, _isBingSearch);
+            _dsKeywords = _webService.SelectTopKeyword(_countryId, _isTesting, _isBingSearch);
 
             if (_dsKeywords.Tables[0].Rows.Count <= 0) return;
 
@@ -535,36 +445,47 @@ namespace AutoCompleteApp
 
             for (var co = 0; co < keywordSplit.Count(); co++)
             {
-                foreach (var c in keywordSplit[co].ToString())
+                foreach (var c in keywordSplit[co])
                 {
                     rnd = new Random();
                     Thread.Sleep(100 + rnd.Next(60, 100));
                     SendKeys.Send(c.ToString());
                 }
-                if ((co < keywordSplit.Count() - 1))
+                if (co < keywordSplit.Count() - 1)
                     SendKeys.Send(" ");
-                Thread.Sleep(300 + rnd.Next(300, 500));
+                Thread.Sleep(200 + rnd.Next(10, 30));
             }
-            var rnd1 = new Random();
+            rnd = new Random();
 
-            Thread.Sleep(1000 + rnd1.Next(60, 100));
+            Thread.Sleep(1000 + rnd.Next(60, 100));
             SendKeys.Send("{ENTER}");
+
+            rnd = new Random();
+            var isPagingSearch = rnd.Next(1, 4);
 
             var checkCount = 0;
             if (string.IsNullOrEmpty(browserName))
             {
                 checkAgainSearchDone:
-                if (!GetPixelsWhenSearchDone(browserName) && checkCount < 3)
+                if (!GetPixelsWhenSearchDone(browserName) && (checkCount < 3))
                 {
                     checkCount++;
                     goto checkAgainSearchDone;
                 }
-                timer2_Tick(null, null);
+                if (isPagingSearch == 3)
+                    GetPagingInProcess(browserName);
+                else
+                    timer2_Tick(null, null);
             }
             else
             {
-                timer2.Interval = 15000 + rnd1.Next(10, 50);
-                timer2.Start();
+                if (isPagingSearch == 3)
+                    GetPagingInProcess(browserName);
+                else
+                {
+                    timer2.Interval = 15000;
+                    timer2.Start();
+                }
             }
         }
 
@@ -578,14 +499,32 @@ namespace AutoCompleteApp
             Getpixels(browserName);
         }
 
+        private void GetPagingInProcess(string browser)
+        {
+            var numberOfClicks = new Random().Next(3, 5);
+            for (var i = 0; i < numberOfClicks && CheckTimeRemains(); i++)
+            {
+                Thread.Sleep(3000);
+                MovemouseAround();
+                ScrollingDownMouse();
+                //Thread.Sleep(3000);
+                Getpixels(browser, true);
+            }
+
+            const int count = 0;
+            var rnd1 = new Random();
+            EndAllBrowsers(browser, rnd1, count);
+        }
+
         #endregion
 
         #region End All Browsers
+
         public void EndIe()
         {
             try
             {
-                Process[] procsChrome = Process.GetProcessesByName("iexplore");
+                var procsChrome = Process.GetProcessesByName("iexplore");
                 if (procsChrome.Count() > 0)
                 {
                     procsChrome[0].Kill();
@@ -594,14 +533,16 @@ namespace AutoCompleteApp
                 }
                 Clearchachelocalall();
             }
-            catch { }
+            catch
+            {
+            }
         }
 
         public void EndChrome()
         {
             try
             {
-                Process[] procsChrome = Process.GetProcessesByName("chrome");
+                var procsChrome = Process.GetProcessesByName("chrome");
                 if (procsChrome.Count() > 0)
                 {
                     procsChrome[0].Kill();
@@ -609,11 +550,13 @@ namespace AutoCompleteApp
                     EndChrome();
                 }
             }
-            catch { }
+            catch
+            {
+            }
         }
 
         [DllImport("user32.dll")]
-        static extern IntPtr GetForegroundWindow();
+        private static extern IntPtr GetForegroundWindow();
 
         private IntPtr _handle;
 
@@ -621,7 +564,7 @@ namespace AutoCompleteApp
         {
             try
             {
-                Process[] procsChrome = Process.GetProcessesByName("chrome");
+                var procsChrome = Process.GetProcessesByName("chrome");
                 if (procsChrome.Count() > 0)
                 {
                     _handle = procsChrome[0].MainWindowHandle;
@@ -631,14 +574,17 @@ namespace AutoCompleteApp
                 }
                 return false;
             }
-            catch { return false; }
+            catch
+            {
+                return false;
+            }
         }
 
         public bool CheckEndFireFox()
         {
             try
             {
-                Process[] procsChrome = Process.GetProcessesByName("firefox");
+                var procsChrome = Process.GetProcessesByName("firefox");
                 if (procsChrome.Count() > 0)
                 {
                     _handle = procsChrome[0].MainWindowHandle;
@@ -647,14 +593,17 @@ namespace AutoCompleteApp
                 }
                 return false;
             }
-            catch { return false; }
+            catch
+            {
+                return false;
+            }
         }
 
         public bool CheckEndIe()
         {
             try
             {
-                Process[] procsChrome = Process.GetProcessesByName("iexplore");
+                var procsChrome = Process.GetProcessesByName("iexplore");
                 if (procsChrome.Count() > 0)
                 {
                     if (procsChrome.Count() > 1)
@@ -666,14 +615,17 @@ namespace AutoCompleteApp
                 }
                 return false;
             }
-            catch { return false; }
+            catch
+            {
+                return false;
+            }
         }
 
         public bool CheckEndSafari()
         {
             try
             {
-                Process[] procsChrome = Process.GetProcessesByName("safari");
+                var procsChrome = Process.GetProcessesByName("safari");
                 if (procsChrome.Count() > 0)
                 {
                     if (procsChrome.Count() > 1)
@@ -685,14 +637,17 @@ namespace AutoCompleteApp
                 }
                 return false;
             }
-            catch { return false; }
+            catch
+            {
+                return false;
+            }
         }
 
         public void Endfirefox()
         {
             try
             {
-                Process[] procsChrome = Process.GetProcessesByName("firefox");
+                var procsChrome = Process.GetProcessesByName("firefox");
                 if (procsChrome.Count() > 0)
                 {
                     procsChrome[0].Kill();
@@ -700,28 +655,35 @@ namespace AutoCompleteApp
                     Endfirefox();
                 }
             }
-            catch { }
+            catch
+            {
+            }
         }
 
         #endregion
 
         #region Get screenshot and click on image
 
-        private int _totalSearches = 0;
-        private void Getpixels(string browser)
+
+        private int _totalSearches;
+
+        private void Getpixels(string browser, bool isPaging = false)
         {
             try
             {
-                Thread.Sleep(5000);
+                Thread.Sleep(3000);
+                if (isPaging == false)
+                {
+                    SendKeys.Send(browser == "chrome" ? "{F3}" : "^(f)");
 
-                SendKeys.Send(browser == "chrome" ? "{F3}" : "^(f)");
-
-                Thread.Sleep(2000);
-                var str2 = _dsKeywords.Tables[0].Rows[0]["Link"].ToString() != "Website" ? _dsKeywords.Tables[0].Rows[0]["Link"].ToString() : "Website";
-                SendKeys.Send(str2);
-                Thread.Sleep(5000);
-                //SendKeys.Send("{ENTER}"); 
-
+                    Thread.Sleep(2000);
+                    var str2 = _dsKeywords.Tables[0].Rows[0]["Link"].ToString() != "Website"
+                        ? _dsKeywords.Tables[0].Rows[0]["Link"].ToString()
+                        : "Website";
+                    SendKeys.Send(str2);
+                    Thread.Sleep(5000);
+                    //SendKeys.Send("{ENTER}"); 
+                }
                 // takes a snapshot of the screen
                 var bmpScreenshot = Screenshot();
                 Thread.Sleep(2000);
@@ -735,7 +697,7 @@ namespace AutoCompleteApp
                 //    SendKeys.Send("{ESC}");
                 //}
                 // makes the background of the form a screenshot of the screen
-                //this.BackgroundImage = bmpScreenshot; 
+                //this.BackgroundImage = bmpScreenshot;
                 //bmpScreenshot.Save(@"d:\myBitmapgoogle.bmp");
                 // find the login button and check if it exists
                 Point location;
@@ -743,27 +705,31 @@ namespace AutoCompleteApp
                 switch (browser)
                 {
                     case "chrome":
-                        success = FindBitmap(Properties.Resources.forchrome, bmpScreenshot, out location) || FindBitmap(Properties.Resources.chromeSearch, bmpScreenshot, out location);
+                        success = FindBitmap(Resources.forchrome, bmpScreenshot, out location) ||
+                                  FindBitmap(Resources.chromeSearch, bmpScreenshot, out location) ||
+                                  FindBitmap(Resources.chromeNextImage, bmpScreenshot, out location);
                         break;
                     case "firefox":
-                        success = FindBitmap(Properties.Resources.firefoxAll, bmpScreenshot, out location) || FindBitmap(Properties.Resources.firefoxSnap, bmpScreenshot, out location);
+                        success = FindBitmap(Resources.firefoxAll, bmpScreenshot, out location) ||
+                                  FindBitmap(Resources.firefoxSnap, bmpScreenshot, out location);
                         break;
                     case "ie":
-                        success = FindBitmap(Properties.Resources.iePagesGoogle, bmpScreenshot, out location) || FindBitmap(Properties.Resources.iePagesGoogle1, bmpScreenshot, out location);
+                        success = FindBitmap(Resources.iePagesGoogle, bmpScreenshot, out location) ||
+                                  FindBitmap(Resources.iePagesGoogle1, bmpScreenshot, out location);
                         break;
                     default:
-                        success = FindBitmap(Properties.Resources.forSafari, bmpScreenshot, out location);
+                        success = FindBitmap(Resources.forSafari, bmpScreenshot, out location);
                         break;
                 }
 
                 if (success)
                 {
                     var rnd1 = new Random();
-                    location.X = location.X + rnd1.Next(2, 20);
+                    location.X = isPaging ? location.X : location.X + rnd1.Next(2, 20);
                     switch (browser)
                     {
                         case "chrome":
-                            location.Y = location.Y - 20;
+                            location.Y = isPaging ? location.Y : location.Y - 20;
                             break;
                         case "firefox":
                             location.Y = location.Y - 20;
@@ -781,79 +747,34 @@ namespace AutoCompleteApp
                     // click
                     MouseClick();
 
-                    Thread.Sleep(15000);
-
-                    _totalSearches++;
-                    Logger.Debug(_totalSearches.ToString());
-                    GetBrowserRunning(browser);
+                    if (isPaging == false)
+                    {
+                        Thread.Sleep(15000);
+                        _totalSearches++;
+                        Logger.Debug(_totalSearches.ToString());
+                        GetBrowserRunning(browser);
+                    }
+                    else
+                    {
+                        Thread.Sleep(5000);
+                        _totalSearches++;
+                        Logger.Debug(_totalSearches.ToString());
+                    }
                 }
                 else
                 {
-                    var count = 0;
+                    const int count = 0;
                     var rnd1 = new Random();
-                    switch (browser)
-                    {
-                        case "chrome":
-                            Thread.Sleep(10000 + rnd1.Next(3000, 6000));
-                            checkChromeEnds:
-                            SendKeys.Send("%{F4}");
-                            Thread.Sleep(2000);
-
-                            //MouseOperations.SetCursorPosition(1364, 2);
-                            if (CheckEndChrome() && count < 5)
-                            {
-                                count++;
-                                goto checkChromeEnds;
-                            }
-                            else
-                                count = 0;
-                            break;
-                        case "ie":
-                            Thread.Sleep(10000 + rnd1.Next(3000, 6000));
-                            checkIEEnds:
-                            SendKeys.Send("%{F4}");
-                            Thread.Sleep(2000);
-                            if (CheckEndIe())
-                                goto checkIEEnds;
-                            break;
-                        case "safari":
-                            Thread.Sleep(10000 + rnd1.Next(3000, 6000));
-                            Clearchachelocalall();
-                            checkSafariEnds:
-                            SendKeys.Send("%{F4}");
-                            Thread.Sleep(2000);
-                            if (CheckEndSafari() && count < 5)
-                            {
-                                count++;
-                                goto checkSafariEnds;
-                            }
-                            else
-                                count = 0;
-                            break;
-                        default:
-                            Thread.Sleep(10000 + rnd1.Next(3000, 6000));
-                            checkFireFoxEnds:
-                            SendKeys.Send("%{F4}");
-                            Thread.Sleep(2000);
-                            if (CheckEndFireFox() && count < 5)
-                            {
-                                count++;
-                                goto checkFireFoxEnds;
-                            }
-                            else
-                                count = 0;
-                            break;
-                    }
+                    EndAllBrowsers(browser, rnd1, count);
                 }
-                WebService.IncreaseSearchCounter(ToInt32(_dsKeywords.Tables[0].Rows[0]["Id"]));
-
+                _webService.IncreaseSearchCounter(ToInt32(_dsKeywords.Tables[0].Rows[0]["Id"]));
             }
             catch
             {
-                WebService.IncreaseSearchCounter(ToInt32(_dsKeywords.Tables[0].Rows[0]["Id"]));
+                _webService.IncreaseSearchCounter(ToInt32(_dsKeywords.Tables[0].Rows[0]["Id"]));
 
-                int count = 0;
-                Random rnd1 = new Random();
+                var count = 0;
+                var rnd1 = new Random();
                 switch (browser)
                 {
                     case "chrome":
@@ -863,13 +784,12 @@ namespace AutoCompleteApp
                         Thread.Sleep(2000);
 
                         //MouseOperations.SetCursorPosition(1364, 2);
-                        if (CheckEndChrome() && count < 5)
+                        if (CheckEndChrome() && (count < 5))
                         {
                             count++;
                             goto checkChromeEnds;
                         }
-                        else
-                            count = 0;
+                        count = 0;
                         break;
                     case "ie":
                         Thread.Sleep(10000 + rnd1.Next(3000, 6000));
@@ -885,45 +805,97 @@ namespace AutoCompleteApp
                         checkSafariEnds:
                         SendKeys.Send("%{F4}");
                         Thread.Sleep(2000);
-                        if (CheckEndSafari() && count < 5)
+                        if (CheckEndSafari() && (count < 5))
                         {
                             count++;
                             goto checkSafariEnds;
                         }
-                        else
-                            count = 0;
+                        count = 0;
                         break;
                     default:
                         Thread.Sleep(10000 + rnd1.Next(3000, 6000));
                         checkFireFoxEnds:
                         SendKeys.Send("%{F4}");
                         Thread.Sleep(2000);
-                        if (CheckEndFireFox() && count < 5)
+                        if (CheckEndFireFox() && (count < 5))
                         {
                             count++;
                             goto checkFireFoxEnds;
                         }
-                        else
-                            count = 0;
+                        count = 0;
                         break;
                 }
             }
         }
 
+        private void EndAllBrowsers(string browser, Random rnd1, int count)
+        {
+            switch (browser)
+            {
+                case "chrome":
+                    Thread.Sleep(10000 + rnd1.Next(3000, 6000));
+                    checkChromeEnds:
+                    SendKeys.Send("%{F4}");
+                    Thread.Sleep(2000);
+
+                    //MouseOperations.SetCursorPosition(1364, 2);
+                    if (CheckEndChrome() && (count < 5))
+                    {
+                        count++;
+                        goto checkChromeEnds;
+                    }
+                    count = 0;
+                    break;
+                case "ie":
+                    Thread.Sleep(10000 + rnd1.Next(3000, 6000));
+                    checkIEEnds:
+                    SendKeys.Send("%{F4}");
+                    Thread.Sleep(2000);
+                    if (CheckEndIe())
+                        goto checkIEEnds;
+                    break;
+                case "safari":
+                    Thread.Sleep(10000 + rnd1.Next(3000, 6000));
+                    Clearchachelocalall();
+                    checkSafariEnds:
+                    SendKeys.Send("%{F4}");
+                    Thread.Sleep(2000);
+                    if (CheckEndSafari() && (count < 5))
+                    {
+                        count++;
+                        goto checkSafariEnds;
+                    }
+                    count = 0;
+                    break;
+                default:
+                    Thread.Sleep(10000 + rnd1.Next(3000, 6000));
+                    checkFireFoxEnds:
+                    SendKeys.Send("%{F4}");
+                    Thread.Sleep(2000);
+                    if (CheckEndFireFox() && (count < 5))
+                    {
+                        count++;
+                        goto checkFireFoxEnds;
+                    }
+                    count = 0;
+                    break;
+            }
+        }
+
         public void LinearSmoothMove(Point newPosition, int steps)
         {
-            Point start = GetCursorPosition();
+            var start = GetCursorPosition();
             PointF iterPoint = start;
 
             // Find the slope of the line segment defined by start and newPosition
-            PointF slope = new PointF(newPosition.X - start.X, newPosition.Y - start.Y);
+            var slope = new PointF(newPosition.X - start.X, newPosition.Y - start.Y);
 
             // Divide by the number of steps
             slope.X = slope.X / steps;
             slope.Y = slope.Y / steps;
-            Random rnd = new Random();
+            var rnd = new Random();
             // Move the mouse to each iterative point.
-            for (int i = 0; i < steps; i++)
+            for (var i = 0; i < steps; i++)
             {
                 iterPoint = new PointF(iterPoint.X + slope.X, iterPoint.Y + slope.Y);
                 Cursor.Position = Point.Round(iterPoint);
@@ -947,21 +919,21 @@ namespace AutoCompleteApp
 
         private Point GetCursorPosition()
         {
-            this.Cursor = new Cursor(Cursor.Current.Handle);
-            Point p = new Point(Cursor.Position.X, Cursor.Position.Y);
+            Cursor = new Cursor(Cursor.Current.Handle);
+            var p = new Point(Cursor.Position.X, Cursor.Position.Y);
             return p;
         }
 
         public void MovemouseAround()
         {
-            Random rnd = new Random();
-            Rect rect = new Rect();
+            var rnd = new Random();
+            var rect = new Rect();
             GetWindowRect(GetForegroundWindow(), out rect);
-            int centerRight = rect.Right / 2;
-            int centerBottom = rect.Bottom / 2;
+            var centerRight = rect.Right / 2;
+            var centerBottom = rect.Bottom / 2;
             LinearSmoothMove(new Point(centerRight + rnd.Next(10, 20), centerBottom + rnd.Next(1, 20)), 40);
 
-            Point start = GetCursorPosition();
+            var start = GetCursorPosition();
             LinearSmoothMove(new Point(start.X + rnd.Next(100, 200), start.Y + rnd.Next(150, 300)), 50);
             Thread.Sleep(1000 + rnd.Next(2000, 5000));
 
@@ -970,7 +942,6 @@ namespace AutoCompleteApp
             Thread.Sleep(1000 + rnd.Next(2000, 5000));
 
             LinearSmoothMove(new Point(centerRight + rnd.Next(10, 20), centerBottom + rnd.Next(1, 20)), 40);
-
         }
 
         [StructLayout(LayoutKind.Sequential)]
@@ -983,23 +954,23 @@ namespace AutoCompleteApp
         }
 
         [DllImport("user32.dll", SetLastError = true)]
-        static extern bool GetWindowRect(IntPtr hWnd, out Rect lpRect);
+        private static extern bool GetWindowRect(IntPtr hWnd, out Rect lpRect);
 
         private void MouseClick()
         {
             mouse_event((int)MouseEventFlags.Leftdown, 0, 0, 0, 0);
-            Thread.Sleep((new Random()).Next(20, 30));
+            Thread.Sleep(new Random().Next(20, 30));
             mouse_event((int)MouseEventFlags.Leftup, 0, 0, 0, 0);
         }
 
         private Bitmap Screenshot()
         {
             // this is where we will store a snapshot of the screen
-            Bitmap bmpScreenshot = new Bitmap(Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height);
+            var bmpScreenshot = new Bitmap(Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height);
 
 
             // creates a graphics object so we can draw the screen in the bitmap (bmpScreenshot)
-            Graphics g = Graphics.FromImage(bmpScreenshot);
+            var g = Graphics.FromImage(bmpScreenshot);
 
             // copy from screen into the bitmap we created
             g.CopyFromScreen(0, 0, 0, 0, Screen.PrimaryScreen.Bounds.Size);
@@ -1010,29 +981,23 @@ namespace AutoCompleteApp
 
         private bool FindBitmap(Bitmap bmpNeedle, Bitmap bmpHaystack, out Point location)
         {
-            for (int outerX = 0; outerX < bmpHaystack.Width - bmpNeedle.Width; outerX++)
-            {
-                for (int outerY = 0; outerY < bmpHaystack.Height - bmpNeedle.Height; outerY++)
+            for (var outerX = 0; outerX < bmpHaystack.Width - bmpNeedle.Width; outerX++)
+                for (var outerY = 0; outerY < bmpHaystack.Height - bmpNeedle.Height; outerY++)
                 {
-                    for (int innerX = 0; innerX < bmpNeedle.Width; innerX++)
-                    {
-                        for (int innerY = 0; innerY < bmpNeedle.Height; innerY++)
+                    for (var innerX = 0; innerX < bmpNeedle.Width; innerX++)
+                        for (var innerY = 0; innerY < bmpNeedle.Height; innerY++)
                         {
-                            Color cNeedle = bmpNeedle.GetPixel(innerX, innerY);
-                            Color cHaystack = bmpHaystack.GetPixel(innerX + outerX, innerY + outerY);
+                            var cNeedle = bmpNeedle.GetPixel(innerX, innerY);
+                            var cHaystack = bmpHaystack.GetPixel(innerX + outerX, innerY + outerY);
 
-                            if (cNeedle.R != cHaystack.R || cNeedle.G != cHaystack.G || cNeedle.B != cHaystack.B)
-                            {
+                            if ((cNeedle.R != cHaystack.R) || (cNeedle.G != cHaystack.G) || (cNeedle.B != cHaystack.B))
                                 goto notFound;
-                            }
                         }
-                    }
                     location = new Point(outerX, outerY);
                     return true;
                     notFound:
-                    continue;
+                    ;
                 }
-            }
             location = Point.Empty;
             return false;
         }
@@ -1047,11 +1012,11 @@ namespace AutoCompleteApp
             switch (browserName)
             {
                 case "ie":
-                    return FindBitmap(Properties.Resources.ieSearchDone, bmpScreenshot, out location);
+                    return FindBitmap(Resources.ieSearchDone, bmpScreenshot, out location);
                 case "firefox":
-                    return FindBitmap(Properties.Resources.firefoxSearchDone, bmpScreenshot, out location);
+                    return FindBitmap(Resources.firefoxSearchDone, bmpScreenshot, out location);
                 case "chrome":
-                    return FindBitmap(Properties.Resources.chromeSearchDone, bmpScreenshot, out location);
+                    return FindBitmap(Resources.chromeSearchDone, bmpScreenshot, out location);
             }
             return false;
         }
@@ -1076,7 +1041,7 @@ namespace AutoCompleteApp
             //notFound:
             //SendKeys.Send("{ENTER}");
             // takes a snapshot of the screen
-            Bitmap bmpScreenshot = Screenshot();
+            var bmpScreenshot = Screenshot();
             Point location;
             //bmpScreenshot.Save("d:\\myBitmapfirefox.bmp");
 
@@ -1085,7 +1050,8 @@ namespace AutoCompleteApp
                 case "chrome":
 
                     #region Chrome Inner
-                    if (FindBitmap(Properties.Resources.innerPagesChrome, bmpScreenshot, out location))
+
+                    if (FindBitmap(Resources.innerPagesChrome, bmpScreenshot, out location))
                     {
                         location.X = location.X + 10;
                         location.Y = location.Y + 5;
@@ -1131,16 +1097,16 @@ namespace AutoCompleteApp
                     {
                         #region Firefox Inner
 
-                        bool success = false;
-                        success = FindBitmap(Properties.Resources.innerPagesFirefoxDark, bmpScreenshot, out location);
+                        var success = false;
+                        success = FindBitmap(Resources.innerPagesFirefoxDark, bmpScreenshot, out location);
                         if (!success)
-                            success = FindBitmap(Properties.Resources.innerpagesFireFox2, bmpScreenshot, out location);
+                            success = FindBitmap(Resources.innerpagesFireFox2, bmpScreenshot, out location);
                         if (!success)
-                            success = FindBitmap(Properties.Resources.innerPagesFirefoxDark3, bmpScreenshot, out location);
+                            success = FindBitmap(Resources.innerPagesFirefoxDark3, bmpScreenshot, out location);
                         if (!success)
-                            success = FindBitmap(Properties.Resources.innerPagesFireFoxDark4, bmpScreenshot, out location);
+                            success = FindBitmap(Resources.innerPagesFireFoxDark4, bmpScreenshot, out location);
                         if (!success)
-                            success = FindBitmap(Properties.Resources.firefoxInnerWhite, bmpScreenshot, out location);
+                            success = FindBitmap(Resources.firefoxInnerWhite, bmpScreenshot, out location);
                         if (success)
                         {
                             location.X = location.X + 10;
@@ -1158,7 +1124,6 @@ namespace AutoCompleteApp
                             location.Y = location.Y + 10;
                             Thread.Sleep(3000);
                             LinearSmoothMove(location, 50);
-
                         }
                         else
                         {
@@ -1178,8 +1143,8 @@ namespace AutoCompleteApp
                     {
                         #region IE Inner
 
-                        bool success = false;
-                        success = FindBitmap(Properties.Resources.ie6, bmpScreenshot, out location);
+                        var success = false;
+                        success = FindBitmap(Resources.ie6, bmpScreenshot, out location);
                         //if (!success)
                         //    success = FindBitmap(Properties.Resources.ie2, bmpScreenshot, out location);
                         //if (!success)
@@ -1211,7 +1176,6 @@ namespace AutoCompleteApp
                             location.Y = location.Y + 10;
                             Thread.Sleep(3000);
                             LinearSmoothMove(location, 50);
-
                         }
                         else
                         {
@@ -1228,20 +1192,21 @@ namespace AutoCompleteApp
                             SendKeys.Send("{BACKSPACE}");
                             Thread.Sleep(500);
                             SendKeys.Send("{ESC}");
-
                         }
+
                         #endregion
                     }
                     break;
                 default:
                     {
                         #region Safari Inner
-                        bool success = false;
-                        success = FindBitmap(Properties.Resources.SafariForInner, bmpScreenshot, out location);
+
+                        var success = false;
+                        success = FindBitmap(Resources.SafariForInner, bmpScreenshot, out location);
                         if (!success)
-                            success = FindBitmap(Properties.Resources.forSafari2, bmpScreenshot, out location);
+                            success = FindBitmap(Resources.forSafari2, bmpScreenshot, out location);
                         if (!success)
-                            success = FindBitmap(Properties.Resources.forSafari3, bmpScreenshot, out location);
+                            success = FindBitmap(Resources.forSafari3, bmpScreenshot, out location);
 
                         if (success)
                         {
@@ -1255,7 +1220,6 @@ namespace AutoCompleteApp
                             location.Y = location.Y + 10;
                             Thread.Sleep(3000);
                             LinearSmoothMove(location, 50);
-
                         }
                         else
                         {
@@ -1268,6 +1232,7 @@ namespace AutoCompleteApp
 
                             SendKeys.Send("not found");
                         }
+
                         #endregion
                     }
                     break;
@@ -1280,22 +1245,36 @@ namespace AutoCompleteApp
 
         private void ScrollingMouse()
         {
-            for (int a = 0; a < 1; a++)
+            for (var a = 0; a < 1; a++)
             {
-                for (int i = 0; i <= 15; i++)
+                for (var i = 0; i <= 15; i++)
                 {
-                    mouse_event((int)MouseEventFlags.Wheel, 0, 0, -50 + (new Random()).Next(10, 30), 0);
-                    Thread.Sleep((new Random()).Next(20, 100));
+                    mouse_event((int)MouseEventFlags.Wheel, 0, 0, -50 + new Random().Next(10, 30), 0);
+                    Thread.Sleep(new Random().Next(20, 100));
                     //mouse_event((uint)MouseEventFlags.XUP, 0, 0, 50, 0);
                 }
-                Thread.Sleep((new Random()).Next(400, 500));
-                for (int i = 0; i <= 20; i++)
+                Thread.Sleep(new Random().Next(400, 500));
+                for (var i = 0; i <= 20; i++)
                 {
-                    mouse_event((int)MouseEventFlags.Wheel, 0, 0, 50 + (new Random()).Next(15, 30), 0);
-                    Thread.Sleep((new Random()).Next(20, 100));
+                    mouse_event((int)MouseEventFlags.Wheel, 0, 0, 50 + new Random().Next(15, 30), 0);
+                    Thread.Sleep(new Random().Next(20, 100));
                     //mouse_event((uint)MouseEventFlags.XUP, 0, 0, 50, 0);
                 }
-                Thread.Sleep((new Random()).Next(400, 700));
+                Thread.Sleep(new Random().Next(400, 700));
+            }
+        }
+
+        private static void ScrollingDownMouse()
+        {
+            for (var a = 0; a < 4; a++)
+            {
+                for (var i = 0; i <= 15; i++)
+                {
+                    mouse_event((int)MouseEventFlags.Wheel, 0, 0, -50 + new Random().Next(10, 30), 0);
+                    Thread.Sleep(new Random().Next(20, 100));
+                    //mouse_event((uint)MouseEventFlags.XUP, 0, 0, 50, 0);
+                }
+                Thread.Sleep(new Random().Next(400, 700));
             }
         }
 
@@ -1304,23 +1283,22 @@ namespace AutoCompleteApp
         {
             MovemouseAround();
 
-            Random linksRun = new Random();
-            Random rnd1 = new Random();
-            int run = linksRun.Next(3, 5);
+            var linksRun = new Random();
+            var rnd1 = new Random();
+            var run = linksRun.Next(3, 5);
             ///int run = linksRun.Next(1, 2);
             int[] numbers; // declare numbers as an int array of any size
             numbers = new int[run];
             //Thread.Sleep(10000);
-            for (int c = 0; c < run; c++)
+            for (var c = 0; c < run; c++)
             {
                 startCounting:
-                Random randomKeyword = new Random();
-                int caseSwitch = randomKeyword.Next(1, 6);
+                var randomKeyword = new Random();
+                var caseSwitch = randomKeyword.Next(1, 6);
                 if (numbers.Contains(caseSwitch))
                     goto startCounting;
                 numbers[c] = caseSwitch;
                 if (CheckTimeRemains())
-                {
                     switch (caseSwitch)
                     {
                         case 1:
@@ -1337,7 +1315,6 @@ namespace AutoCompleteApp
                                     Thread.Sleep(3000 + rnd1.Next(1000, 4000));
                                     goto case1;
                                 }
-
                             }
                             GetpixelsForInnerPages(browser, "Contact");
                             break;
@@ -1438,15 +1415,12 @@ namespace AutoCompleteApp
                             GetpixelsForInnerPages(browser, "Contact");
                             break;
                     }
-                }
             }
 
-            bool checkIe = false;
-            int count = 0;
+            var checkIe = false;
+            var count = 0;
             if (CheckTimeRemains())
-            {
                 GetpixelsForInnerPages(browser, "Contact");
-            }
             if (browser == "chrome")
             {
                 Thread.Sleep(10000 + rnd1.Next(3000, 6000));
@@ -1455,13 +1429,12 @@ namespace AutoCompleteApp
                 Thread.Sleep(2000);
 
                 //MouseOperations.SetCursorPosition(1364, 2);
-                if (CheckEndChrome() && count < 5)
+                if (CheckEndChrome() && (count < 5))
                 {
                     count++;
                     goto checkChromeEnds;
                 }
-                else
-                    count = 0;
+                count = 0;
             }
             else if (browser == "safari")
             {
@@ -1470,13 +1443,12 @@ namespace AutoCompleteApp
                 checkSafariEnds:
                 SendKeys.Send("%{F4}");
                 Thread.Sleep(2000);
-                if (CheckEndSafari() && count < 5)
+                if (CheckEndSafari() && (count < 5))
                 {
                     count++;
                     goto checkSafariEnds;
                 }
-                else
-                    count = 0;
+                count = 0;
             }
             else if (browser == "ie")
             {
@@ -1494,13 +1466,12 @@ namespace AutoCompleteApp
                 checkFireFoxEnds:
                 SendKeys.Send("%{F4}");
                 Thread.Sleep(2000);
-                if (CheckEndFireFox() && count < 5)
+                if (CheckEndFireFox() && (count < 5))
                 {
                     count++;
                     goto checkFireFoxEnds;
                 }
-                else
-                    count = 0;
+                count = 0;
             }
             Clearchachelocalall();
             Logger.Debug("Search completed with browser : " + browser + " at : " + DateTime.Now);
@@ -1514,89 +1485,59 @@ namespace AutoCompleteApp
 
         #region Check Timers
 
-        DateTime _timerAll;
+        private DateTime _timerAll;
+
         public bool CheckTimeRemains()
         {
             TimeSpan t;
-            bool check = false;
+            var check = false;
             t = DateTime.Now - _timerAll;
             if (timer3.Interval - 40000 > t.TotalMilliseconds)
-            {
                 check = true;
-            }
             return check;
         }
 
-        DateTime _timerAllWithin;
+        private DateTime _timerAllWithin;
+
         public bool CheckTimeRemainsWithin()
         {
             TimeSpan t;
-            bool check = false;
+            var check = false;
             t = DateTime.Now - _timerAllWithin;
             if (timer4.Interval - 4000 > t.TotalMilliseconds)
-            {
                 check = true;
-            }
             else
-            {
                 timer4.Stop();
-            }
             return check;
         }
 
         public void ReleaseProxyAndKeyword()
         {
             if (_dsKeywords.Tables.Count > 0)
-            {
-                //MessageBox.Show("");
-                WebService.ReleaseKeyword(ToInt32(_dsKeywords.Tables[0].Rows[0]["Id"]));
-                //webService.ReleaseProxy(Convert.ToInt32(ds.Tables[0].Rows[0]["Id"]));
-            }
+                _webService.ReleaseKeyword(ToInt32(_dsKeywords.Tables[0].Rows[0]["Id"]));
         }
 
         #endregion
 
         #region All Button Events
 
-        int _searchType = 0;
-        bool _isTesting = false;
-        bool _isBingSearch = false;
+        private int _searchType;
+        private bool _isTesting;
+        private readonly bool _isBingSearch;
+
         private void button1_Click(object sender, EventArgs e)
         {
             StartIpVanish();
 
             Thread.Sleep(30000);
 
-            _searchType = 1;
-            _countryId = ddlCountry.SelectedIndex == 0 ? 1 : 2;
-
-            _isTesting = chkIsTesting.Checked;
-            this.WindowState = FormWindowState.Minimized;
-            notifyIcon2.BalloonTipTitle = @"Minimize to Tray";
-            notifyIcon2.BalloonTipText = @"App still running";
-            switch (this.WindowState)
-            {
-                case FormWindowState.Minimized:
-                    notifyIcon2.Visible = true;
-                    notifyIcon2.ShowBalloonTip(500);
-                    this.Hide();
-                    break;
-                case FormWindowState.Normal:
-                    notifyIcon2.Visible = false;
-                    break;
-                case FormWindowState.Maximized:
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
-
             timer1_Tick(null, null);
         }
 
         private void notifyIcon2_MouseDoubleClick(object sender, MouseEventArgs e)
         {
-            this.Show();
-            this.WindowState = FormWindowState.Normal;
+            Show();
+            WindowState = FormWindowState.Normal;
         }
 
         private void button2_Click(object sender, EventArgs e)
@@ -1610,17 +1551,17 @@ namespace AutoCompleteApp
                 MouseOperations.SetCursorPosition(1364, 2);
                 MouseClick();
             }
-            else if (_initialCheckForBrowser < (ToInt32(txtBrowser.Text) * 2))
+            else if (_initialCheckForBrowser < ToInt32(txtBrowser.Text) * 2)
             {
                 MouseOperations.SetCursorPosition(1364, 2);
                 MouseClick();
             }
-            else if (_initialCheckForBrowser < (ToInt32(txtBrowser.Text) * 3))
+            else if (_initialCheckForBrowser < ToInt32(txtBrowser.Text) * 3)
             {
                 MouseOperations.SetCursorPosition(1364, 2);
                 MouseClick();
             }
-            else if (_initialCheckForBrowser < (ToInt32(txtBrowser.Text) * 4))
+            else if (_initialCheckForBrowser < ToInt32(txtBrowser.Text) * 4)
             {
                 MouseOperations.SetCursorPosition(1364, 2);
                 MouseClick();
@@ -1628,7 +1569,6 @@ namespace AutoCompleteApp
 
             MessageBox.Show(@"Process has been stopped!");
         }
-
 
         #endregion
 
@@ -1640,8 +1580,8 @@ namespace AutoCompleteApp
             //string MozilaPath = Environment.GetEnvironmentVariable("USERPROFILE") + @"\AppData\Roaming\Mozilla\Firefox\";
             //string Opera1 = Environment.GetEnvironmentVariable("USERPROFILE") + @"\AppData\Local\Opera\Opera";
             //string Opera2 = Environment.GetEnvironmentVariable("USERPROFILE") + @"\AppData\Roaming\Opera\Opera";
-            string safari1 = Environment.GetEnvironmentVariable("USERPROFILE") + @"\AppData\Local\Apple Computer\Safari";
-            string safari2 = Environment.GetEnvironmentVariable("USERPROFILE") + @"\AppData\Roaming\Apple Computer\Safari";
+            var safari1 = Environment.GetEnvironmentVariable("USERPROFILE") + @"\AppData\Local\Apple Computer\Safari";
+            var safari2 = Environment.GetEnvironmentVariable("USERPROFILE") + @"\AppData\Roaming\Apple Computer\Safari";
             //string IE1 = Environment.GetEnvironmentVariable("USERPROFILE") + @"\AppData\Local\Microsoft\Intern~1";
             //string IE2 = Environment.GetEnvironmentVariable("USERPROFILE") + @"\AppData\Local\Microsoft\Windows\History";
             //string IE3 = Environment.GetEnvironmentVariable("USERPROFILE") + @"\AppData\Local\Microsoft\Windows\Tempor~1";
@@ -1649,56 +1589,43 @@ namespace AutoCompleteApp
             //string Flash = Environment.GetEnvironmentVariable("USERPROFILE") + @"\AppData\Roaming\Macromedia\Flashp~1";
 
             //Call This Method ClearAllSettings and Pass String Array Param
-            ClearAllSettings(new string[] { safari1, safari2 });
-
+            ClearAllSettings(new[] { safari1, safari2 });
         }
+
         public void ClearAllSettings(string[] clearPath)
         {
-            foreach (string historyPath in clearPath)
-            {
+            foreach (var historyPath in clearPath)
                 if (Directory.Exists(historyPath))
-                {
                     DoDelete(new DirectoryInfo(historyPath));
-                }
-            }
         }
-        void DoDelete(DirectoryInfo folder)
+
+        private void DoDelete(DirectoryInfo folder)
         {
             try
             {
-
-                foreach (FileInfo file in folder.GetFiles())
-                {
+                foreach (var file in folder.GetFiles())
                     try
                     {
                         file.Delete();
                     }
                     catch
-                    { }
-                }
-                foreach (DirectoryInfo subfolder in folder.GetDirectories())
-                {
+                    {
+                    }
+                foreach (var subfolder in folder.GetDirectories())
                     DoDelete(subfolder);
-                }
             }
             catch
             {
-
             }
         }
 
         #endregion
-
     }
 
     #region NativeWindowHandler
+
     public class NativeWindowHandler
     {
-
-        public NativeWindowHandler()
-        {
-        }
-
         private const int WmClose = 0x0010;
         private const int SwShownormal = 1;
         private const int SwShowminimized = 2;
@@ -1718,48 +1645,46 @@ namespace AutoCompleteApp
         private static extern int ShowWindow(int hwnd, int nCmdShow);
 
 
-        public Int32 GetWnd(string processName)
+        public int GetWnd(string processName)
         {
-            Process[] processes = Process.GetProcessesByName(processName);
+            var processes = Process.GetProcessesByName(processName);
             if (processes.Length == 0)
                 throw new ArgumentException("Process Name " + processName +
-                    " not running!");
+                                            " not running!");
 
             return processes[0].MainWindowHandle.ToInt32();
         }
 
 
-        public Int32 GetForegroundWindowEx()
+        public int GetForegroundWindowEx()
         {
             return GetForegroundWindow();
         }
 
 
-        public void CloseWindow(Int32 handle)
+        public void CloseWindow(int handle)
         {
             SendMessage(handle, WmClose, 0, 0);
         }
 
 
-        public void MinimizeWindow(Int32 handle)
+        public void MinimizeWindow(int handle)
         {
             ShowWindow(handle, SwShowminimized);
         }
 
 
-        public void MaximizeWindow(Int32 handle)
+        public void MaximizeWindow(int handle)
         {
             ShowWindow(handle, SwShowmaximized);
         }
 
 
-        public void NormalizeWindow(Int32 handle)
+        public void NormalizeWindow(int handle)
         {
             ShowWindow(handle, SwShownormal);
         }
     }
 
-
     #endregion
-
 }

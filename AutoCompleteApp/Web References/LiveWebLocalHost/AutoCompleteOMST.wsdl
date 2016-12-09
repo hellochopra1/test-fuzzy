@@ -7,6 +7,7 @@
           <s:sequence>
             <s:element minOccurs="1" maxOccurs="1" name="Id" type="s:int" />
             <s:element minOccurs="1" maxOccurs="1" name="IsTesting" type="s:boolean" />
+            <s:element minOccurs="1" maxOccurs="1" name="IsBing" type="s:boolean" />
           </s:sequence>
         </s:complexType>
       </s:element>
@@ -25,7 +26,11 @@
         </s:complexType>
       </s:element>
       <s:element name="ResetSearchCounter">
-        <s:complexType />
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="IsTesting" type="s:boolean" />
+          </s:sequence>
+        </s:complexType>
       </s:element>
       <s:element name="ResetSearchCounterResponse">
         <s:complexType>
@@ -41,6 +46,72 @@
           </s:sequence>
         </s:complexType>
       </s:element>
+      <s:element name="GetSettingsForGoogleAndBing">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="id" type="s:int" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetSettingsForGoogleAndBingResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetSettingsForGoogleAndBingResult">
+              <s:complexType>
+                <s:sequence>
+                  <s:element ref="s:schema" />
+                  <s:any />
+                </s:sequence>
+              </s:complexType>
+            </s:element>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ResetSearchCounterForHoldKeywords">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="IsTesting" type="s:boolean" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ResetSearchCounterForHoldKeywordsResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="ResetSearchCounterForHoldKeywordsResult">
+              <s:complexType>
+                <s:sequence>
+                  <s:element ref="s:schema" />
+                  <s:any />
+                </s:sequence>
+              </s:complexType>
+            </s:element>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetTotalCountForKeywords">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="IsTesting" type="s:boolean" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetTotalCountForKeywordsResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetTotalCountForKeywordsResult" type="tns:ArrayOfGetCountClass" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="ArrayOfGetCountClass">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="GetCountClass" nillable="true" type="tns:GetCountClass" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="GetCountClass">
+        <s:sequence>
+          <s:element minOccurs="1" maxOccurs="1" name="Count" type="s:int" />
+        </s:sequence>
+      </s:complexType>
       <s:element name="SelectTopProxy">
         <s:complexType>
           <s:sequence>
@@ -126,6 +197,24 @@
   <wsdl:message name="ResetSearchCounterSoapOut">
     <wsdl:part name="parameters" element="tns:ResetSearchCounterResponse" />
   </wsdl:message>
+  <wsdl:message name="GetSettingsForGoogleAndBingSoapIn">
+    <wsdl:part name="parameters" element="tns:GetSettingsForGoogleAndBing" />
+  </wsdl:message>
+  <wsdl:message name="GetSettingsForGoogleAndBingSoapOut">
+    <wsdl:part name="parameters" element="tns:GetSettingsForGoogleAndBingResponse" />
+  </wsdl:message>
+  <wsdl:message name="ResetSearchCounterForHoldKeywordsSoapIn">
+    <wsdl:part name="parameters" element="tns:ResetSearchCounterForHoldKeywords" />
+  </wsdl:message>
+  <wsdl:message name="ResetSearchCounterForHoldKeywordsSoapOut">
+    <wsdl:part name="parameters" element="tns:ResetSearchCounterForHoldKeywordsResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetTotalCountForKeywordsSoapIn">
+    <wsdl:part name="parameters" element="tns:GetTotalCountForKeywords" />
+  </wsdl:message>
+  <wsdl:message name="GetTotalCountForKeywordsSoapOut">
+    <wsdl:part name="parameters" element="tns:GetTotalCountForKeywordsResponse" />
+  </wsdl:message>
   <wsdl:message name="SelectTopProxySoapIn">
     <wsdl:part name="parameters" element="tns:SelectTopProxy" />
   </wsdl:message>
@@ -171,6 +260,18 @@
       <wsdl:input message="tns:ResetSearchCounterSoapIn" />
       <wsdl:output message="tns:ResetSearchCounterSoapOut" />
     </wsdl:operation>
+    <wsdl:operation name="GetSettingsForGoogleAndBing">
+      <wsdl:input message="tns:GetSettingsForGoogleAndBingSoapIn" />
+      <wsdl:output message="tns:GetSettingsForGoogleAndBingSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ResetSearchCounterForHoldKeywords">
+      <wsdl:input message="tns:ResetSearchCounterForHoldKeywordsSoapIn" />
+      <wsdl:output message="tns:ResetSearchCounterForHoldKeywordsSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetTotalCountForKeywords">
+      <wsdl:input message="tns:GetTotalCountForKeywordsSoapIn" />
+      <wsdl:output message="tns:GetTotalCountForKeywordsSoapOut" />
+    </wsdl:operation>
     <wsdl:operation name="SelectTopProxy">
       <wsdl:input message="tns:SelectTopProxySoapIn" />
       <wsdl:output message="tns:SelectTopProxySoapOut" />
@@ -209,6 +310,33 @@
     </wsdl:operation>
     <wsdl:operation name="ResetSearchCounter">
       <soap:operation soapAction="http://tempuri.org/ResetSearchCounter" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetSettingsForGoogleAndBing">
+      <soap:operation soapAction="http://tempuri.org/GetSettingsForGoogleAndBing" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ResetSearchCounterForHoldKeywords">
+      <soap:operation soapAction="http://tempuri.org/ResetSearchCounterForHoldKeywords" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetTotalCountForKeywords">
+      <soap:operation soapAction="http://tempuri.org/GetTotalCountForKeywords" style="document" />
       <wsdl:input>
         <soap:body use="literal" />
       </wsdl:input>
@@ -284,6 +412,33 @@
     </wsdl:operation>
     <wsdl:operation name="ResetSearchCounter">
       <soap12:operation soapAction="http://tempuri.org/ResetSearchCounter" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetSettingsForGoogleAndBing">
+      <soap12:operation soapAction="http://tempuri.org/GetSettingsForGoogleAndBing" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ResetSearchCounterForHoldKeywords">
+      <soap12:operation soapAction="http://tempuri.org/ResetSearchCounterForHoldKeywords" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetTotalCountForKeywords">
+      <soap12:operation soapAction="http://tempuri.org/GetTotalCountForKeywords" style="document" />
       <wsdl:input>
         <soap12:body use="literal" />
       </wsdl:input>

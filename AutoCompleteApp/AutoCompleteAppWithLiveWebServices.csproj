@@ -203,9 +203,13 @@
     <Compile Include="Youtube.Designer.cs">
       <DependentUpon>Youtube.cs</DependentUpon>
     </Compile>
+    <None Include="Resources\chromeNextImage.bmp" />
     <EmbeddedResource Include="Youtube.resx">
       <DependentUpon>Youtube.cs</DependentUpon>
     </EmbeddedResource>
+    <None Include="Web References\LiveWebLocalHost\GetCountClass.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
     <None Include="Web References\YoutubeService\Reference.map">
       <Generator>MSDiscoCodeGenerator</Generator>
       <LastGenOutput>Reference.cs</LastGenOutput>

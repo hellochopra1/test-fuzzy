@@ -78,7 +78,7 @@ namespace AutoCompleteApp
         {
             InitializeComponent();
             IsBingSearch = true;
-            ///Starting the application
+            //Starting the application
             timer5.Interval = 10000;
             timer5.Start();
 

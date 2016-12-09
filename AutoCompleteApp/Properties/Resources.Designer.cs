@@ -123,6 +123,16 @@ namespace AutoCompleteApp.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap chromeNextImage {
+            get {
+                object obj = ResourceManager.GetObject("chromeNextImage", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap chromeSearch {
             get {
                 object obj = ResourceManager.GetObject("chromeSearch", resourceCulture);
